@@ -13,7 +13,6 @@ import (
 	waE2E "go.mau.fi/whatsmeow/proto/waE2E"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types/events"
-	"go.mau.fi/whatsmeow/util/keys"
 	waLog "go.mau.fi/whatsmeow/util/log"
 	"google.golang.org/protobuf/proto"
 
@@ -101,9 +100,7 @@ func CreateClient(ctx context.Context) *whatsmeow.Client {
 	// create openai client
 	openai_key := os.Getenv("OPENAI_KEY")
 	if openai_key == "" {
-		err_str := "Error: 'OPENAI_KEY' environment variable is not set or empty"
-		fmt.Println(err_str)
-		panic(err_str)
+		panic("'OPENAI_KEY' environment variable is not set or empty")
 	}
 	openai_client := openai.NewClient("")
 
