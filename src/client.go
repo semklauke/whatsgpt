@@ -4,19 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mdp/qrterminal"
-
 	"go.mau.fi/whatsmeow"
-	waE2E "go.mau.fi/whatsmeow/proto/waE2E"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
-	"google.golang.org/protobuf/proto"
-
-	"github.com/bep/debounce"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -25,54 +19,21 @@ type MyClient struct {
 	openai *openai.Client
 	ctx context.Context
 	eventHandler []uint32
-	debouncer func(func())
-	gptinstructions string
+	chats []*Chat
 }
 
 func createEventHandler(clt *MyClient) func(interface{}) {
+
+	noah := NoahChat(clt)
+
 	return func(evt interface{}) {
 		switch v := evt.(type) {
 		case *events.Message:
-			// normal chat message
-			if v.Info.IsFromMe {
-				return
-			}
-			if v.IsEphemeral || v.Message.ImageMessage != nil {
-				return
-			}
-			var messageBody = v.Message.GetConversation()
-			if v.Info.Sender.User == "491711999899" {
-				// noah
-				fmt.Printf("[MSG from Noah]: %s\n", messageBody)
-				clt.debouncer(func() {
-					resp, err := clt.openai.CreateChatCompletion(
-						context.Background(),
-						openai.ChatCompletionRequest{
-							Model: openai.GPT3Dot5Turbo,
-							Messages: []openai.ChatCompletionMessage{
-								{
-									Role:    openai.ChatMessageRoleSystem,
-									Content: clt.gptinstructions,
-								},
-								{
-									Role:    openai.ChatMessageRoleUser,
-									Content: messageBody,
-								},
-							},
-						},
-					)
-
-					if err != nil {
-						fmt.Printf("Error: %v\n", err)
-						return
-					}
-
-					fmt.Printf("Ans: %s\n", resp.Choices[0].Message.Content)
-					clt.wa.SendMessage(clt.ctx, v.Info.Chat, &waE2E.Message{
-						Conversation: proto.String(resp.Choices[0].Message.Content),
-					})
-				})
-			}
+			// skip my messages
+			// if v.Info.IsFromMe {
+			// 	return
+			// }
+			noah.HandleMessage(v)
 		}
 	}
 }
@@ -102,22 +63,16 @@ func CreateClient(ctx context.Context) *whatsmeow.Client {
 	if openai_key == "" {
 		panic("'OPENAI_KEY' environment variable is not set or empty")
 	}
-	openai_client := openai.NewClient("")
+	openai_client := openai.NewClient(openai_key)
 
-	// load file with gtp instructions
-	gptfile, err := os.ReadFile("src/chatgpt_instructions.txt")
-    if err != nil {
-        fmt.Print(err)
-        panic(err)
-    }
+	// create Chats
+
 	// create client wrapper
 	myclient := MyClient{
 		wa: client,
 		openai: openai_client,
 		ctx: ctx,
 		eventHandler: make([]uint32, 0),
-		debouncer: debounce.New(70 * time.Second),
-		gptinstructions: string(gptfile),
 	}
 
 	// is this a new login ?
