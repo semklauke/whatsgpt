@@ -3,6 +3,7 @@ package whatsgpt
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -69,8 +70,13 @@ func NoahChat(clt *MyClient) *Chat {
 		// clear message cache
 		noah.message_cache = make([]*events.Message, 0)
 
+		ans := resp.Choices[0].Message.Content;
+
+		ans = strings.Replace(ans, "Sem :", "", 1)
+		ans = strings.Replace(ans, "Noah :", "", 1)
+
 		// respond to message
-		fmt.Printf("Ans: %s\n", resp.Choices[0].Message.Content)
+		fmt.Printf("Ans: %s\n", ans)
 		clt.wa.SendMessage(clt.ctx, msg.Info.Chat, &waE2E.Message{
 			Conversation: proto.String(resp.Choices[0].Message.Content),
 		})
