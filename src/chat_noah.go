@@ -12,7 +12,7 @@ import (
 )
 
 func NoahChat(clt *MyClient) *Chat {
-	noah := NewChat(clt, "491711999899", 70 * time.Second)
+	noah := NewChat(clt, "491711999899", 90 * time.Second)
 
 	// load file with gpt instructions
 	gptfile, err := os.ReadFile("gptinstructions/noah.txt")
@@ -41,6 +41,11 @@ func NoahChat(clt *MyClient) *Chat {
 		}
 		for _, cacheMsg := range noah.message_cache {
 			if body := cacheMsg.Message.GetConversation(); body != "" {
+				if cacheMsg.Info.IsFromMe {
+					body = "Sem: " + body
+				} else {
+					body = "Noah: " + body
+				}
 				openai_messages = append(openai_messages, openai.ChatCompletionMessage{
 					Role: openai.ChatMessageRoleUser,
 					Content: body,

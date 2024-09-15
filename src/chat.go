@@ -26,8 +26,12 @@ func NewChat(myclt *MyClient, userid string, debounce_time time.Duration) *Chat 
 }
 
 func (chat *Chat) HandleMessage(msg *events.Message) {
-	chat.message_cache = append(chat.message_cache, msg)
 	if msg.Info.Chat.User == chat.userid {
-		chat.debouncer(func() { chat.handle_message(msg) })
+		// store all messages in the chat with this users
+		chat.message_cache = append(chat.message_cache, msg)
+		// if it is from the user, handle message
+		if msg.Info.Sender.User == chat.userid {
+			chat.debouncer(func() { chat.handle_message(msg) })
+		}
 	}
 }
