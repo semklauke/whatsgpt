@@ -57,7 +57,7 @@ func NoahChat(clt *MyClient) *Chat {
 		resp, err := clt.openai.CreateChatCompletion(
 			clt.ctx,
 			openai.ChatCompletionRequest{
-				Model: openai.GPT3Dot5Turbo,
+				Model: openai.GPT4,
 				Messages: openai_messages,
 			},
 		)
@@ -78,7 +78,7 @@ func NoahChat(clt *MyClient) *Chat {
 		// respond to message
 		fmt.Printf("Ans: %s\n", ans)
 		clt.wa.SendMessage(clt.ctx, msg.Info.Chat, &waE2E.Message{
-			Conversation: proto.String(resp.Choices[0].Message.Content),
+			Conversation: proto.String(ans),
 		})
 	}
 
