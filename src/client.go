@@ -20,7 +20,7 @@ import (
 
 func createEventHandler(clt *model.MyClient) func(interface{}) {
 
-    clt.Chats = append(clt.Chats, modules.NoahChat(clt))
+    //clt.Chats = append(clt.Chats, modules.NoahChat(clt))
     clt.Modules = append(clt.Modules, modules.MensaKoeln(clt))
 
     return func(evt interface{}) {
