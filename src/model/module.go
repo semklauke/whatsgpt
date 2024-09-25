@@ -24,6 +24,10 @@ func NewChatModule(myclt *MyClient, debounce_time time.Duration) *ChatModule {
 }
 
 func (module *ChatModule) HandleMessage(msg *events.Message) {
+    // skip old messages
+    if time.Since(msg.Info.Timestamp) >= time.Minute {
+        return
+    }
     // store all messages in the chat with this users
     module.Message_cache = append(module.Message_cache, msg)
 	module.Debouncer(func() { module.Handle_message(msg) })

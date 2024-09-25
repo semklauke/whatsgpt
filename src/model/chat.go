@@ -23,6 +23,10 @@ func NewUserChat(myclt *MyClient, userid string, debounce_time time.Duration) *U
 }
 
 func (chat *UserChat) HandleMessage(msg* events.Message) {
+    // skip old messages
+    if time.Since(msg.Info.Timestamp) >= time.Minute {
+        return
+    }
     if msg.Info.Chat.User == chat.Userid {
         // only store message for this chat
         chat.Message_cache = append(chat.Message_cache, msg)

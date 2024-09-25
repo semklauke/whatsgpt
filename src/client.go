@@ -1,20 +1,20 @@
 package src
 
 import (
-    "context"
-    "fmt"
-    "os"
+	"context"
+	"fmt"
+	"os"
 
-    "whatsgpt/src/modules"
-    "whatsgpt/src/model"
+	"whatsgpt/src/model"
+	"whatsgpt/src/modules"
 
-    _ "github.com/mattn/go-sqlite3"
-    "github.com/mdp/qrterminal"
-    "go.mau.fi/whatsmeow"
-    "go.mau.fi/whatsmeow/store/sqlstore"
-    "go.mau.fi/whatsmeow/types/events"
-    waLog "go.mau.fi/whatsmeow/util/log"
-    openai "github.com/sashabaranov/go-openai"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/mdp/qrterminal"
+	openai "github.com/sashabaranov/go-openai"
+	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/store/sqlstore"
+	"go.mau.fi/whatsmeow/types/events"
+	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
 
@@ -30,6 +30,7 @@ func createEventHandler(clt *model.MyClient) func(interface{}) {
             // if v.Info.IsFromMe {
             //  return
             // }
+
             for _, chat := range clt.Chats {
                 chat.HandleMessage(v)
             }
