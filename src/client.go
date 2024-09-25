@@ -1,9 +1,12 @@
-package whatsgpt
+package src
 
 import (
     "context"
     "fmt"
     "os"
+
+    "whatsgpt/src/modules"
+    "whatsgpt/src/model"
 
     _ "github.com/mattn/go-sqlite3"
     "github.com/mdp/qrterminal"
@@ -14,17 +17,11 @@ import (
     openai "github.com/sashabaranov/go-openai"
 )
 
-type MyClient struct {
-    wa *whatsmeow.Client
-    openai *openai.Client
-    ctx context.Context
-    eventHandler []uint32
-    chats []*Chat
-}
 
-func createEventHandler(clt *MyClient) func(interface{}) {
+func createEventHandler(clt *model.MyClient) func(interface{}) {
 
-    noah := NoahChat(clt)
+    clt.Chats = append(clt.Chats, modules.NoahChat(clt))
+    clt.Modules = append(clt.Modules, modules.MensaKoeln(clt))
 
     return func(evt interface{}) {
         switch v := evt.(type) {
@@ -33,7 +30,13 @@ func createEventHandler(clt *MyClient) func(interface{}) {
             // if v.Info.IsFromMe {
             //  return
             // }
-            noah.HandleMessage(v)
+            for _, chat := range clt.Chats {
+                chat.HandleMessage(v)
+            }
+
+            for _, module := range clt.Modules {
+                module.HandleMessage(v)
+            }
         }
     }
 }
@@ -68,11 +71,11 @@ func CreateClient(ctx context.Context) *whatsmeow.Client {
     // create Chats
 
     // create client wrapper
-    myclient := MyClient{
-        wa: client,
-        openai: openai_client,
-        ctx: ctx,
-        eventHandler: make([]uint32, 0),
+    myclient := model.MyClient{
+        WA: client,
+        Openai: openai_client,
+        Ctx: ctx,
+        EventHandler: make([]uint32, 0),
     }
 
     // is this a new login ?
@@ -101,7 +104,7 @@ func CreateClient(ctx context.Context) *whatsmeow.Client {
 
     // add event listeners
     msgHandler := client.AddEventHandler(createEventHandler(&myclient))
-    myclient.eventHandler = append(myclient.eventHandler, msgHandler )
+    myclient.EventHandler = append(myclient.EventHandler, msgHandler )
 
     return client
 }

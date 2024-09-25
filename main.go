@@ -7,7 +7,8 @@ import (
     "os/signal"
     "syscall"
     "time"
-    "whatsgpt/src"
+
+    . "whatsgpt/src"
 
     "go.mau.fi/whatsmeow"
 )
@@ -23,7 +24,7 @@ func main() {
     signal.Notify(quitChannel, syscall.SIGINT, syscall.SIGTERM)
 
     // create whatsapp client
-    client := whatsgpt.CreateClient(context.Background())
+    client := CreateClient(context.Background())
 
     // run forever
     for {
