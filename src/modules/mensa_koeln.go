@@ -22,7 +22,7 @@ func MensaKoeln(clt *model.MyClient) *model.ChatModule {
     // handle messages...
     mensa.Handle_message = func(msg *events.Message) {
         // skip messages we don't want to handle
-        if msg.IsEphemeral || msg.Message.ImageMessage != nil || msg.IsEdit || msg.Info.Chat.IsBroadcastList() {
+        if msg.IsEphemeral || msg.Message.ImageMessage != nil || msg.IsEdit {
             return
         }
 
