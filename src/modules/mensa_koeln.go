@@ -26,7 +26,7 @@ func MensaKoeln(clt *model.MyClient) *model.ChatModule {
             return
         }
 
-        mensaRequest := regexp.MustCompile(`^mensa pl(s+)( \w+)?$`)
+        mensaRequest := regexp.MustCompile(`^(?i)mensa pl(s+)( \w+)?$`)
         var (
             mensa_id string
             mensa_date time.Time
