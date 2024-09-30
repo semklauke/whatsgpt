@@ -91,6 +91,7 @@ func MensaKoeln(clt *model.MyClient) *model.ChatModule {
             href, ok := s.Parent().Attr("href")
             if ok && strings.Contains(href, mensa_tag) {
                 dish_name := strings.TrimSpace(removeFoodWarnings.ReplaceAllString(s.Text(), ""))
+                dish_name = strings.ReplaceAll(dish_name, "\nauch als Beilage erhält­lich .", "")
                 supp_raw := s.Parent().Find("p.ct.text2share:not(.next)").First().Text()
                 supp := strings.TrimSpace(removeFoodWarnings2.ReplaceAllString(supp_raw, ""))
                 if !strings.Contains(dish_name, "Selbst­bedienung") {
