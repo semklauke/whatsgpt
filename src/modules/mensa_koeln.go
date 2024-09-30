@@ -84,12 +84,13 @@ func MensaKoeln(clt *model.MyClient) *model.ChatModule {
 
         dishes := make([]string, 0, 8)
 
+        removeFoodWarnings := regexp.MustCompile(`\([\d,\D]*\)`)
         removeFoodWarnings2 := regexp.MustCompile(`\s\(.*?\)`)
 
         doc.Find("h3.ct.ui-li-heading.text2share").Each(func(i int, s *goquery.Selection) {
             href, ok := s.Parent().Attr("href")
             if ok && strings.Contains(href, mensa_tag) {
-                dish_name := strings.TrimSpace(removeFoodWarnings2.ReplaceAllString(s.Text(), ""))
+                dish_name := strings.TrimSpace(removeFoodWarnings.ReplaceAllString(s.Text(), ""))
                 supp_raw := s.Parent().Find("p.ct.text2share:not(.next)").First().Text()
                 supp := strings.TrimSpace(removeFoodWarnings2.ReplaceAllString(supp_raw, ""))
                 if !strings.Contains(dish_name, "Selbst­bedienung") {
